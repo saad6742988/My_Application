@@ -35,9 +35,11 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(MainActivity.this, "User logged in successfully", Toast.LENGTH_SHORT).show();
+                    Log.d("login","done");
 
                 }else{
                     Toast.makeText(MainActivity.this, "Log in Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("login","not done");
                 }
             }
         });
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("ok",shot.getKey());
                 }
                 Log.d("ok",snapshot.getChildren().getClass().toString());
+                Log.d("hello","hello");
                 //System.out.println(value);
                 // after getting the value we are setting
                 // our value to our text view in below line.
