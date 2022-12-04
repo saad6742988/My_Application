@@ -25,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -149,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
                     viewData.setText("Title: "+title+"\n"+"Des : "+des);
                     Log.d(TAG+" data","Found Data");
                 }else{
+                    //needed when no document exist
+                    viewData.setText("");
                     Toast.makeText(MainActivity.this, "not Exist", Toast.LENGTH_SHORT).show();
                     Log.d(TAG+" Data","Not Exist");
                 }
@@ -222,5 +225,16 @@ public class MainActivity extends AppCompatActivity {
         // we can also pass key value pair to be updated
         noteRef.update(note);
         //noteRef.update(key_des,des);
+    }
+    public void deleteDescription(View v){
+//        Map<String,Object> note =new HashMap<>();
+//        note.put(key_des, FieldValue.delete());
+//        noteRef.update(note);
+        //Directly remove desccription value, can be done in one line
+        noteRef.update(key_des,FieldValue.delete());
+    }
+
+    public void deleteNote(View v){
+        noteRef.delete();
     }
 }

@@ -35,6 +35,17 @@
         android:layout_height="wrap_content"
         android:text="Update Description"
         android:onClick="updateDescription"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Description"
+        android:onClick="deleteDescription"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Note"
+        android:onClick="deleteNote"/>
+
 
 
     <TextView
