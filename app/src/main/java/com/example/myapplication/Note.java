@@ -1,11 +1,23 @@
 package com.example.myapplication;
 
+import com.google.firebase.firestore.Exclude;
+
 public class Note {
     private String title;
     private String description;
+    private String documentId;
 
     public Note() {
         //public default Constructor
+    }
+
+    @Exclude
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public String getTitle() {
@@ -24,6 +36,6 @@ public class Note {
     //over-riding toString()
     public String toString()
     {
-        return "Title : "+this.title+"\n"+"Description : "+this.description;
+        return "ID : "+documentId+"\n"+"Title : "+this.title+"\n"+"Description : "+this.description;
     }
 }

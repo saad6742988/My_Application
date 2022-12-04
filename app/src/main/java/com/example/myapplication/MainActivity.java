@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -29,6 +30,8 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText editTextDes;
     private TextView viewData;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference notebookRef =db.collection("Notebook");
     private DocumentReference noteRef = db.collection("Notebook")
             .document("5taecpoRckBuv5ZAW4AI");
     //private DocumentReference noteRef = db.document("Notebook/5taecpoRckBuv5ZAW4AI");
@@ -133,30 +137,49 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
         // using this to attach listen to this acticity and destroy it automatically
-        noteRef.addSnapshotListener(this,new EventListener<DocumentSnapshot>() {
+        // for one document
+//        noteRef.addSnapshotListener(this,new EventListener<DocumentSnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+//                if(error != null)
+//                {
+//                    Toast.makeText(MainActivity.this, "Error in Loading", Toast.LENGTH_SHORT).show();
+//                    Log.d(TAG+" data On Start",error.toString());
+//                    return;
+//                }
+//
+//                if(documentSnapshot.exists())
+//                {
+////                    String title = documentSnapshot.getString(key_title);
+////                    String des = documentSnapshot.getString(key_des);
+////                    viewData.setText("Title: "+title+"\n"+"Des : "+des);
+//                    Note note=documentSnapshot.toObject(Note.class);
+//                    viewData.setText("Title: "+note.getTitle()+"\n"+"Des : "+note.getDescription());
+//                    Log.d(TAG+" data","Found Data");
+//                }else{
+//                    //needed when no document exist
+//                    viewData.setText("");
+//                    Toast.makeText(MainActivity.this, "not Exist", Toast.LENGTH_SHORT).show();
+//                    Log.d(TAG+" Data","Not Exist");
+//                }
+//            }
+//        });
+        notebookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
-                if(error != null)
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
+                if(error!=null)
                 {
-                    Toast.makeText(MainActivity.this, "Error in Loading", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG+" data On Start",error.toString());
                     return;
                 }
-
-                if(documentSnapshot.exists())
+                String data="";
+                for(QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots)
                 {
-//                    String title = documentSnapshot.getString(key_title);
-//                    String des = documentSnapshot.getString(key_des);
-//                    viewData.setText("Title: "+title+"\n"+"Des : "+des);
-                    Note note=documentSnapshot.toObject(Note.class);
-                    viewData.setText("Title: "+note.getTitle()+"\n"+"Des : "+note.getDescription());
-                    Log.d(TAG+" data","Found Data");
-                }else{
-                    //needed when no document exist
-                    viewData.setText("");
-                    Toast.makeText(MainActivity.this, "not Exist", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG+" Data","Not Exist");
+                    Note note = documentSnapshot.toObject(Note.class);
+                    note.setDocumentId(documentSnapshot.getId());
+                    data+=note.toString()+"\n\n";
                 }
+                viewData.setText(data);
+
             }
         });
     }
@@ -167,7 +190,36 @@ public class MainActivity extends AppCompatActivity {
 //        noteListener.remove(); //destroy noteListener when app goes to background.
 //    }
 
-    public void saveNote(View v)
+//    public void saveNote(View v)
+//    {
+//        String title = editTextTitle.getText().toString();
+//        String des =editTextDes.getText().toString();
+//
+////        //by hash maps
+////        Map<String,Object> note = new HashMap<>();
+////        note.put(key_title,title);
+////        note.put(key_des,des);
+//
+//        //by custom java objects
+//        Note note=new Note(title,des);
+//        Log.d(TAG+" Note ",note.toString());
+//
+//        noteRef.set(note)
+//                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void unused) {
+//                        Toast.makeText(MainActivity.this, "Note Saved", Toast.LENGTH_SHORT).show();
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Toast.makeText(MainActivity.this, "Error in Saving!", Toast.LENGTH_SHORT).show();
+//                        Log.d(TAG,e.toString());
+//                    }
+//                });
+//    }
+
+    public void addNote(View v)
     {
         String title = editTextTitle.getText().toString();
         String des =editTextDes.getText().toString();
@@ -181,70 +233,86 @@ public class MainActivity extends AppCompatActivity {
         Note note=new Note(title,des);
         Log.d(TAG+" Note ",note.toString());
 
-        noteRef.set(note)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Toast.makeText(MainActivity.this, "Note Saved", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(MainActivity.this, "Error in Saving!", Toast.LENGTH_SHORT).show();
-                        Log.d(TAG,e.toString());
-                    }
-                });
-    }
-    public void loadNote(View v)
-    {
-        noteRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        notebookRef.add(note).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists())
-                {
-//                    // manually getting data
-//                    String title = documentSnapshot.getString(key_title);
-//                    String des = documentSnapshot.getString(key_des);
-                    //get by java class
-                    Note note=documentSnapshot.toObject(Note.class);
-                    viewData.setText("Title: "+note.getTitle()+"\n"+"Des : "+note.getDescription());
-                    Log.d(TAG+" data","Found Data");
-                }else{
-                    Toast.makeText(MainActivity.this, "not Exist", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG+" Data","Not Exist");
-                }
+            public void onSuccess(DocumentReference documentReference) {
+                Toast.makeText(MainActivity.this, "Note Added", Toast.LENGTH_SHORT).show();
+                Log.d(TAG+" Note Status","Added");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
-                Log.d(TAG+" Data",e.toString());
+                Log.d(TAG+" Note Status","Not Added");
             }
         });
     }
-    public void updateDescription(View v)
+//    public void loadNote(View v)
+//    {
+//        noteRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                if(documentSnapshot.exists())
+//                {
+////                    // manually getting data
+////                    String title = documentSnapshot.getString(key_title);
+////                    String des = documentSnapshot.getString(key_des);
+//                    //get by java class
+//                    Note note=documentSnapshot.toObject(Note.class);
+//                    viewData.setText("Title: "+note.getTitle()+"\n"+"Des : "+note.getDescription());
+//                    Log.d(TAG+" data","Found Data");
+//                }else{
+//                    Toast.makeText(MainActivity.this, "not Exist", Toast.LENGTH_SHORT).show();
+//                    Log.d(TAG+" Data","Not Exist");
+//                }
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+//                Log.d(TAG+" Data",e.toString());
+//            }
+//        });
+//    }
+    public void loadNotes(View v)
     {
-        String des = editTextDes.getText().toString();
-        Map<String,Object> note = new HashMap<>();
-        note.put(key_des,des);
-        //following method also creates new document/record if it does not exist
-        // so it is not preferable as we have to only update existing record.
-        //noteRef.set(note, SetOptions.merge());
-
-        //this method will update if document exists,
-        // we can also pass key value pair to be updated
-        noteRef.update(note);
-        //noteRef.update(key_des,des);
+        notebookRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                String data="";
+                for(QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots)
+                {
+                    Note note = documentSnapshot.toObject(Note.class);
+                    note.setDocumentId(documentSnapshot.getId());
+                    data+=note.toString()+"\n\n";
+                }
+                viewData.setText(data);
+            }
+        });
     }
-    public void deleteDescription(View v){
-//        Map<String,Object> note =new HashMap<>();
-//        note.put(key_des, FieldValue.delete());
+//    public void updateDescription(View v)
+//    {
+//        String des = editTextDes.getText().toString();
+//        Map<String,Object> note = new HashMap<>();
+//        note.put(key_des,des);
+//        //following method also creates new document/record if it does not exist
+//        // so it is not preferable as we have to only update existing record.
+//        //noteRef.set(note, SetOptions.merge());
+//
+//        //this method will update if document exists,
+//        // we can also pass key value pair to be updated
 //        noteRef.update(note);
-        //Directly remove desccription value, can be done in one line
-        noteRef.update(key_des,FieldValue.delete());
-    }
-
-    public void deleteNote(View v){
-        noteRef.delete();
-    }
+//        //noteRef.update(key_des,des);
+//    }
+//    public void deleteDescription(View v){
+////        Map<String,Object> note =new HashMap<>();
+////        note.put(key_des, FieldValue.delete());
+////        noteRef.update(note);
+//        //Directly remove desccription value, can be done in one line
+//        noteRef.update(key_des,FieldValue.delete());
+//    }
+//
+//    public void deleteNote(View v){
+//        noteRef.delete();
+//    }
 }
