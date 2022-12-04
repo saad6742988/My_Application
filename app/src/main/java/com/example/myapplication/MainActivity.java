@@ -145,9 +145,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if(documentSnapshot.exists())
                 {
-                    String title = documentSnapshot.getString(key_title);
-                    String des = documentSnapshot.getString(key_des);
-                    viewData.setText("Title: "+title+"\n"+"Des : "+des);
+//                    String title = documentSnapshot.getString(key_title);
+//                    String des = documentSnapshot.getString(key_des);
+//                    viewData.setText("Title: "+title+"\n"+"Des : "+des);
+                    Note note=documentSnapshot.toObject(Note.class);
+                    viewData.setText("Title: "+note.getTitle()+"\n"+"Des : "+note.getDescription());
                     Log.d(TAG+" data","Found Data");
                 }else{
                     //needed when no document exist
@@ -170,10 +172,15 @@ public class MainActivity extends AppCompatActivity {
         String title = editTextTitle.getText().toString();
         String des =editTextDes.getText().toString();
 
-        Map<String,Object> note = new HashMap<>();
-        note.put(key_title,title);
-        note.put(key_des,des);
+//        //by hash maps
+//        Map<String,Object> note = new HashMap<>();
+//        note.put(key_title,title);
+//        note.put(key_des,des);
+
+        //by custom java objects
+        Note note=new Note(title,des);
         Log.d(TAG+" Note ",note.toString());
+
         noteRef.set(note)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -195,9 +202,12 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if(documentSnapshot.exists())
                 {
-                    String title = documentSnapshot.getString(key_title);
-                    String des = documentSnapshot.getString(key_des);
-                    viewData.setText("Title: "+title+"\n"+"Des : "+des);
+//                    // manually getting data
+//                    String title = documentSnapshot.getString(key_title);
+//                    String des = documentSnapshot.getString(key_des);
+                    //get by java class
+                    Note note=documentSnapshot.toObject(Note.class);
+                    viewData.setText("Title: "+note.getTitle()+"\n"+"Des : "+note.getDescription());
                     Log.d(TAG+" data","Found Data");
                 }else{
                     Toast.makeText(MainActivity.this, "not Exist", Toast.LENGTH_SHORT).show();
