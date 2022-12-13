@@ -30,6 +30,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String key_des = "description";
     private EditText editTextTitle;
     private EditText editTextDes;
+    private EditText editTextPriority;
     private TextView viewData;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference notebookRef =db.collection("Notebook");
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         editTextTitle = findViewById(R.id.title);
         editTextDes = findViewById(R.id.description);
         viewData = findViewById(R.id.viewData);
+        editTextPriority=findViewById(R.id.priority);
 //        mAuth=FirebaseAuth.getInstance();
 //        mAuth.signInWithEmailAndPassword("saad@gmail.com","ok123456ok").addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 //            @Override
@@ -223,6 +226,9 @@ public class MainActivity extends AppCompatActivity {
     {
         String title = editTextTitle.getText().toString();
         String des =editTextDes.getText().toString();
+        if(editTextPriority.length()==0)
+            editTextPriority.setText("0");
+        int priority = Integer.parseInt(editTextPriority.getText().toString());
 
 //        //by hash maps
 //        Map<String,Object> note = new HashMap<>();
@@ -230,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 //        note.put(key_des,des);
 
         //by custom java objects
-        Note note=new Note(title,des);
+        Note note=new Note(title,des,priority);
         Log.d(TAG+" Note ",note.toString());
 
         notebookRef.add(note).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -274,21 +280,36 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 //    }
-    public void loadNotes(View v)
-    {
+    public void loadNotesAll(View v) {
         notebookRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                String data="";
-                for(QueryDocumentSnapshot documentSnapshot:queryDocumentSnapshots)
-                {
+                String data = "";
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Note note = documentSnapshot.toObject(Note.class);
                     note.setDocumentId(documentSnapshot.getId());
-                    data+=note.toString()+"\n\n";
+                    data += note.toString() + "\n\n";
                 }
                 viewData.setText(data);
             }
         });
+    }
+    public void loadNotesWithQuery(View v) {
+        notebookRef.whereGreaterThanOrEqualTo("priority", 2)
+                .orderBy("priority", Query.Direction.DESCENDING) //used when getting multiple results
+                .limit(2) //top 2 results
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        String data = "";
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Note note = documentSnapshot.toObject(Note.class);
+                            note.setDocumentId(documentSnapshot.getId());
+                            data += note.toString() + "\n\n";
+                        }
+                        viewData.setText(data);
+                    }
+                });
     }
 //    public void updateDescription(View v)
 //    {

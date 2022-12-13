@@ -20,6 +20,12 @@
         android:id="@+id/description"
         android:hint="Description"
         android:inputType="text"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Priority"
+        android:id="@+id/priority"
+        android:inputType="number"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,8 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Load"
-        android:onClick="loadNotes"
-        android:enabled="false"/>
+        android:onClick="loadNotesWithQuery"
+        android:enabled="true"/>
 <!--    <Button-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
