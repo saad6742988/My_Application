@@ -66,6 +66,13 @@ public class MainActivity extends AppCompatActivity {
         editTextDes = findViewById(R.id.description);
         viewData = findViewById(R.id.viewData);
         editTextPriority=findViewById(R.id.priority);
+
+        //global data
+        GlobalData global = (GlobalData) getApplicationContext();
+        Log.d("global from main",global.myGlobal);
+        global.myGlobal = "changed global";
+//        Intent i =new Intent(this,register.class);
+//        startActivity(i);
 //        mAuth=FirebaseAuth.getInstance();
 //        mAuth.signInWithEmailAndPassword("saad@gmail.com","ok123456ok").addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 //            @Override

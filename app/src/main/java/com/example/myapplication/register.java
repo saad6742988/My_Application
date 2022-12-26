@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +31,9 @@ public class register extends AppCompatActivity {
         reg = findViewById(R.id.reg);
 
         mAuth = FirebaseAuth.getInstance();
-
+        //global data
+        GlobalData global = (GlobalData) getApplicationContext();
+        Log.d("global from register",global.myGlobal);
         reg.setOnClickListener(view ->{
             createUser();
         });
