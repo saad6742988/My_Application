@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -38,6 +39,19 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.HashMap;
 import java.util.Map;
 
+
+
+///used for mail sesnding
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Properties;
+
 public class MainActivity extends AppCompatActivity {
 
 //    FirebaseAuth mAuth;
@@ -67,6 +81,23 @@ public class MainActivity extends AppCompatActivity {
         viewData = findViewById(R.id.viewData);
         editTextPriority=findViewById(R.id.priority);
 
+        //avoid NetworkOnMainThreadException
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
+        Log.d("Main Thread ID :", ""+Thread.currentThread().getId());
+
+        //sending email in new thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sendEmail();
+            }
+        }).start();
+
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
+
+        Log.d("Main Thread ID :", ""+Thread.currentThread().getId());
         //global data
         GlobalData global = (GlobalData) getApplicationContext();
         Log.d("global from main",global.myGlobal);
@@ -118,6 +149,50 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
+    }
+
+    private void sendEmail() {
+        final String sender = "eventtraofficial@gmail.com";
+        final String password = "bvwfbbeyzgsrtoyy";
+        String msgToSend = "hello from Eventtra";
+        Properties prop = new Properties();
+        prop.put("mail.smtp.auth","true");
+        prop.put("mail.smtp.starttls.enable","true");
+        prop.put("mail.smtp.host","smtp.gmail.com");
+        prop.put("mail.smtp.port","587");
+        Session session = Session.getInstance(prop, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(sender,password);
+            }
+        });
+        try{
+            Message m=new MimeMessage(session);
+            m.setFrom(new InternetAddress(sender));
+            m.setRecipient(Message.RecipientType.TO,new InternetAddress("ms6742988@gmail.com"));
+            m.setSubject("Test");
+            m.setText("Testing Java Mail\n"+msgToSend+Thread.currentThread().getId());
+            Transport.send(m);
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(MainActivity.this,"Send Successfully", Toast.LENGTH_SHORT).show();
+                    Log.d("email status","Send Successfully");
+                }
+            });
+
+        }catch (MessagingException e)
+        {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(MainActivity.this,"Send unSuccessfully", Toast.LENGTH_SHORT).show();
+                    Log.d("email status","Send usSuccessfully: "+e.getMessage().toString());
+                }
+            });
+
+            //throw new RuntimeException(e);
+        }
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
     }
 
     @Override
