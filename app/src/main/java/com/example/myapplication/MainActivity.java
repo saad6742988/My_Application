@@ -54,6 +54,7 @@ import java.util.Properties;
 
 public class MainActivity extends AppCompatActivity {
 
+    ////test
 //    FirebaseAuth mAuth;
 //    FirebaseDatabase db;
 //    TextView ok;
