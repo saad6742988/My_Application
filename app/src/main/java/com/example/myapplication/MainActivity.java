@@ -153,14 +153,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendEmail() {
-        final String sender = "eventtraofficial@gmail.com";
-        final String password = "bvwfbbeyzgsrtoyy";
+        final String sender = "eventtra@outlook.com";
+        final String password = "saad&6742988";
         String msgToSend = "hello from Eventtra";
         Properties prop = new Properties();
-        prop.put("mail.smtp.auth","true");
-        prop.put("mail.smtp.starttls.enable","true");
-        prop.put("mail.smtp.host","smtp.gmail.com");
-        prop.put("mail.smtp.port","587");
+        //gmail
+//        prop.put("mail.smtp.auth","true");
+//        prop.put("mail.smtp.starttls.enable","true");
+//        prop.put("mail.smtp.host","smtp.gmail.com");
+//        prop.put("mail.smtp.port","587");
+        //outlook
+        prop.put("mail.smtp.auth", "true");
+        prop.put("mail.smtp.starttls.enable", "true");
+        prop.put("mail.smtp.host", "smtp-mail.outlook.com");
+        prop.put("mail.smtp.port", "587");
         Session session = Session.getInstance(prop, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -171,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
             Message m=new MimeMessage(session);
             m.setFrom(new InternetAddress(sender));
             m.setRecipient(Message.RecipientType.TO,new InternetAddress("ms6742988@gmail.com"));
-            m.setSubject("Test");
-            m.setText("Testing Java Mail\n"+msgToSend+Thread.currentThread().getId());
+            m.setSubject("Test 4");
+            m.setText("Testing Java Mail 2\n"+msgToSend+Thread.currentThread().getId());
             Transport.send(m);
             runOnUiThread(new Runnable() {
                 public void run() {
